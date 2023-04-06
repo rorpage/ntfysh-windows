@@ -9,13 +9,24 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
+
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore -c Release
     - name: Publish
-      run: dotnet publish -c Release -o ./output
+      run: dotnet publish /p:DebugType=None /p:DebugSymbols=false -c Release -o ./output
+
+    - name: Zip output
+      run: 7z a ./output/ntfy.sh.Release.zip ./output/*
+
+    - name: Upload release asset
+      uses: actions/upload-artifact@v3
+      with:
+        name: ntfy.sh.Release.zip
+        path: output/ntfy.sh.Release.zip
